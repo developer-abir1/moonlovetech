@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 4000;
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 require('dotenv').config();
 
@@ -26,6 +26,24 @@ async function run() {
       const cousor = productCollation.find({});
       const product = await cousor.toArray();
       res.send({ status: 'success', data: product });
+    });
+    app.get('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const booking = await productCollation.findOne(query);
+      res.send(booking);
+    });
+
+    app.post('/products', async (req, res) => {
+      const product = req.body;
+      const result = await productCollation.insertOne(product);
+      res.send(result);
+    });
+    app.delete('/products/:id', async (req, res) => {
+      const id = req.params.id;
+
+      const result = await productCollation.deleteOne({ _id: ObjectId(id) });
+      res.send(result);
     });
 
     console.log('database is connected');
